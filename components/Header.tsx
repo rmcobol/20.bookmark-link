@@ -2,13 +2,13 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between border-b border-black/[.08] px-6 dark:border-white/[.145]">
-      <span className="text-lg font-semibold tracking-tight text-black dark:text-zinc-50">
+    <header className="sticky top-0 z-10 flex h-12 shrink-0 items-center justify-between border-b border-[var(--border)] bg-[var(--background)]/80 px-4 backdrop-blur-sm">
+      <span className="text-base font-semibold tracking-tight text-[var(--text)]">
         🔖 북마크 링크
       </span>
       <Link
         href="/new"
-        className="flex h-9 items-center gap-1.5 rounded-full bg-foreground px-4 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
+        className="flex h-9 items-center gap-1.5 rounded-md bg-[var(--accent)] px-4 text-sm font-medium text-white transition-colors duration-150 hover:bg-[var(--accent-hover)]"
       >
         <span aria-hidden>+</span>새 링크
       </Link>

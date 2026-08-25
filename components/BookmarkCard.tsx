@@ -17,18 +17,18 @@ export default function BookmarkCard({ bookmark }: BookmarkCardProps) {
       href={bookmark.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex flex-col gap-2 rounded-xl border border-black/[.08] p-4 transition-colors hover:border-black/[.16] dark:border-white/[.145] dark:hover:border-white/[.3]"
+      className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 transition-colors duration-150 hover:bg-[var(--hover-bg)]"
     >
       <div className="flex items-center gap-2">
-        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-black/[.06] text-xs dark:bg-white/[.08]">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[var(--hover-bg)] text-xs">
           🔗
         </span>
-        <span className="truncate text-xs text-zinc-500 dark:text-zinc-400">{hostname}</span>
+        <span className="truncate text-xs text-[var(--text-sub)]">{hostname}</span>
       </div>
-      <h3 className="line-clamp-1 text-sm font-medium text-black dark:text-zinc-50">
+      <h3 className="line-clamp-1 text-sm font-medium text-[var(--text)]">
         {bookmark.title}
       </h3>
-      <p className="line-clamp-2 text-xs text-zinc-600 dark:text-zinc-400">
+      <p className="line-clamp-2 text-xs text-[var(--text-sub)]">
         {bookmark.description}
       </p>
     </a>

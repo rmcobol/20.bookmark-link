@@ -8,7 +8,7 @@ type BookmarkGridProps = {
 export default function BookmarkGrid({ bookmarks }: BookmarkGridProps) {
   if (bookmarks.length === 0) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">등록된 링크가 없습니다.</p>
+      <p className="text-sm text-[var(--text-sub)]">등록된 링크가 없습니다.</p>
     );
   }
 

@@ -15,17 +15,17 @@ export default function FolderList({ folders, activeFolderId }: FolderListProps)
           <li key={folder.id}>
             <Link
               href={`/folder/${folder.id}`}
-              className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition-colors ${
+              className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition-colors duration-150 ${
                 isActive
-                  ? "bg-black/[.06] font-medium text-black dark:bg-white/[.08] dark:text-zinc-50"
-                  : "text-zinc-600 hover:bg-black/[.04] dark:text-zinc-400 dark:hover:bg-white/[.06]"
+                  ? "bg-[var(--hover-bg)] font-medium text-[var(--text)]"
+                  : "text-[var(--text-sub)] hover:bg-[var(--hover-bg)] hover:text-[var(--text)]"
               }`}
             >
               <span className="flex items-center gap-2">
                 <span aria-hidden>📁</span>
                 {folder.name}
               </span>
-              <span className="text-xs text-zinc-400 dark:text-zinc-500">{folder.count}</span>
+              <span className="text-xs text-[var(--text-sub)]">{folder.count}</span>
             </Link>
           </li>
         );
