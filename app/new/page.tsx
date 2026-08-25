@@ -1,16 +1,16 @@
-import BookmarkGrid from "@/components/BookmarkGrid";
 import Header from "@/components/Header";
+import NewLinkForm from "@/components/NewLinkForm";
 import Sidebar from "@/components/Sidebar";
-import { bookmarks, folders } from "./_lib/mock-data";
+import { folders } from "@/app/_lib/mock-data";
 
-export default function Home() {
+export default function NewLinkPage() {
   return (
     <div className="flex flex-1 flex-col bg-white dark:bg-black">
       <Header />
       <div className="flex flex-1">
         <Sidebar folders={folders} />
-        <main className="flex-1 overflow-y-auto p-6">
-          <BookmarkGrid bookmarks={bookmarks} />
+        <main className="flex flex-1 items-start justify-center overflow-y-auto p-6">
+          <NewLinkForm folders={folders} />
         </main>
       </div>
     </div>
