@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NewFolderButton from "./NewFolderButton";
 
 export default function Header() {
   return (
@@ -6,12 +7,15 @@ export default function Header() {
       <span className="text-base font-semibold tracking-tight text-[var(--text)]">
         🔖 북마크 링크
       </span>
-      <Link
-        href="/new"
-        className="flex h-9 items-center gap-1.5 rounded-md bg-[var(--accent)] px-4 text-sm font-medium text-white transition-colors duration-150 hover:bg-[var(--accent-hover)]"
-      >
-        <span aria-hidden>+</span>새 링크
-      </Link>
+      <div className="flex items-center gap-2">
+        <NewFolderButton />
+        <Link
+          href="/new"
+          className="flex h-9 items-center gap-1.5 rounded-md bg-[var(--accent)] px-4 text-sm font-medium text-white transition-colors duration-150 hover:bg-[var(--accent-hover)]"
+        >
+          <span aria-hidden>+</span>새 링크
+        </Link>
+      </div>
     </header>
   );
 }

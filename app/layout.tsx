@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { FolderProvider } from "./_lib/folder-context";
+import { folders } from "./_lib/mock-data";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,7 +25,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <FolderProvider initialFolders={folders}>{children}</FolderProvider>
+      </body>
     </html>
   );
 }

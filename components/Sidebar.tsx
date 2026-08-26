@@ -1,13 +1,15 @@
-import type { Folder } from "@/app/_lib/types";
+"use client";
+
+import { useFolders } from "@/app/_lib/folder-context";
 import Link from "next/link";
 import FolderList from "./FolderList";
 
 type SidebarProps = {
-  folders: Folder[];
   activeFolderId?: string;
 };
 
-export default function Sidebar({ folders, activeFolderId }: SidebarProps) {
+export default function Sidebar({ activeFolderId }: SidebarProps) {
+  const { folders } = useFolders();
   const isAllActive = activeFolderId === undefined;
 
   return (
