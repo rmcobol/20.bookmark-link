@@ -1,3 +1,6 @@
+"use client";
+
+import { useBookmarks } from "@/app/_lib/bookmark-context";
 import type { Folder } from "@/app/_lib/types";
 import Link from "next/link";
 import DeleteFolderButton from "./DeleteFolderButton";
@@ -9,10 +12,14 @@ type FolderListProps = {
 };
 
 export default function FolderList({ folders, activeFolderId }: FolderListProps) {
+  const { bookmarks } = useBookmarks();
+
   return (
     <ul className="flex flex-col gap-1">
       {folders.map((folder) => {
         const isActive = folder.id === activeFolderId;
+        const count = bookmarks.filter((bookmark) => bookmark.folderId === folder.id).length;
+
         return (
           <li key={folder.id} className="group relative">
             <Link
@@ -28,7 +35,7 @@ export default function FolderList({ folders, activeFolderId }: FolderListProps)
                 {folder.name}
               </span>
               <span className="text-xs text-[var(--text-sub)] transition-opacity duration-150 group-hover:opacity-0">
-                {folder.count}
+                {count}
               </span>
             </Link>
             <div className="pointer-events-none absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100">

@@ -26,7 +26,7 @@ export function FolderProvider({ initialFolders, children }: FolderProviderProps
 
     setFolders((prev) => [
       ...prev,
-      { id: `folder-${Date.now()}`, name: trimmed, count: 0 },
+      { id: `folder-${Date.now()}`, name: trimmed },
     ]);
   }, []);
 

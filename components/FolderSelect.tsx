@@ -1,10 +1,10 @@
-import type { Folder } from "@/app/_lib/types";
+"use client";
 
-type FolderSelectProps = {
-  folders: Folder[];
-};
+import { useFolders } from "@/app/_lib/folder-context";
 
-export default function FolderSelect({ folders }: FolderSelectProps) {
+export default function FolderSelect() {
+  const { folders } = useFolders();
+
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor="folder" className="text-sm font-medium text-[var(--text)]">
