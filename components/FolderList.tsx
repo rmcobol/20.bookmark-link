@@ -1,6 +1,7 @@
 import type { Folder } from "@/app/_lib/types";
 import Link from "next/link";
 import DeleteFolderButton from "./DeleteFolderButton";
+import EditFolderButton from "./EditFolderButton";
 
 type FolderListProps = {
   folders: Folder[];
@@ -30,7 +31,8 @@ export default function FolderList({ folders, activeFolderId }: FolderListProps)
                 {folder.count}
               </span>
             </Link>
-            <div className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100">
+            <div className="pointer-events-none absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100">
+              <EditFolderButton folderId={folder.id} folderName={folder.name} />
               <DeleteFolderButton folderId={folder.id} folderName={folder.name} />
             </div>
           </li>

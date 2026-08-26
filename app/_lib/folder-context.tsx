@@ -6,6 +6,7 @@ import type { Folder } from "./types";
 type FolderContextValue = {
   folders: Folder[];
   addFolder: (name: string) => void;
+  renameFolder: (id: string, name: string) => void;
   deleteFolder: (id: string) => void;
 };
 
@@ -29,13 +30,22 @@ export function FolderProvider({ initialFolders, children }: FolderProviderProps
     ]);
   }, []);
 
+  const renameFolder = useCallback((id: string, name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+
+    setFolders((prev) =>
+      prev.map((folder) => (folder.id === id ? { ...folder, name: trimmed } : folder)),
+    );
+  }, []);
+
   const deleteFolder = useCallback((id: string) => {
     setFolders((prev) => prev.filter((folder) => folder.id !== id));
   }, []);
 
   const value = useMemo(
-    () => ({ folders, addFolder, deleteFolder }),
-    [folders, addFolder, deleteFolder],
+    () => ({ folders, addFolder, renameFolder, deleteFolder }),
+    [folders, addFolder, renameFolder, deleteFolder],
   );
 
   return <FolderContext.Provider value={value}>{children}</FolderContext.Provider>;
