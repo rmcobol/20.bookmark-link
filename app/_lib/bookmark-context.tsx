@@ -14,6 +14,7 @@ type NewBookmarkInput = {
 type BookmarkContextValue = {
   bookmarks: Bookmark[];
   addBookmark: (input: NewBookmarkInput) => void;
+  deleteBookmark: (id: string) => void;
 };
 
 const BookmarkContext = createContext<BookmarkContextValue | null>(null);
@@ -30,7 +31,14 @@ export function BookmarkProvider({ initialBookmarks, children }: BookmarkProvide
     setBookmarks((prev) => [...prev, { id: `bookmark-${Date.now()}`, ...input }]);
   }, []);
 
-  const value = useMemo(() => ({ bookmarks, addBookmark }), [bookmarks, addBookmark]);
+  const deleteBookmark = useCallback((id: string) => {
+    setBookmarks((prev) => prev.filter((bookmark) => bookmark.id !== id));
+  }, []);
+
+  const value = useMemo(
+    () => ({ bookmarks, addBookmark, deleteBookmark }),
+    [bookmarks, addBookmark, deleteBookmark],
+  );
 
   return <BookmarkContext.Provider value={value}>{children}</BookmarkContext.Provider>;
 }
