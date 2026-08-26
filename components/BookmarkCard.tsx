@@ -3,6 +3,7 @@
 import type { Bookmark } from "@/app/_lib/types";
 import { useState } from "react";
 import DeleteBookmarkButton from "./DeleteBookmarkButton";
+import EditBookmarkButton from "./EditBookmarkButton";
 
 type BookmarkCardProps = {
   bookmark: Bookmark;
@@ -52,7 +53,8 @@ export default function BookmarkCard({ bookmark }: BookmarkCardProps) {
           </p>
         </div>
       </a>
-      <div className="pointer-events-none absolute top-2 right-2 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100">
+      <div className="pointer-events-none absolute top-2 right-2 flex items-center gap-1.5 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100">
+        <EditBookmarkButton bookmark={bookmark} />
         <DeleteBookmarkButton bookmarkId={bookmark.id} bookmarkTitle={bookmark.title} />
       </div>
     </div>

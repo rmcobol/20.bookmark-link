@@ -11,9 +11,16 @@ type NewBookmarkInput = {
   thumbnail?: string;
 };
 
+type BookmarkUpdateInput = {
+  folderId: string;
+  title: string;
+  description: string;
+};
+
 type BookmarkContextValue = {
   bookmarks: Bookmark[];
   addBookmark: (input: NewBookmarkInput) => void;
+  updateBookmark: (id: string, input: BookmarkUpdateInput) => void;
   deleteBookmark: (id: string) => void;
 };
 
@@ -31,13 +38,25 @@ export function BookmarkProvider({ initialBookmarks, children }: BookmarkProvide
     setBookmarks((prev) => [...prev, { id: `bookmark-${Date.now()}`, ...input }]);
   }, []);
 
+  const updateBookmark = useCallback((id: string, input: BookmarkUpdateInput) => {
+    if (!input.title.trim() || !input.folderId) return;
+
+    setBookmarks((prev) =>
+      prev.map((bookmark) =>
+        bookmark.id === id
+          ? { ...bookmark, folderId: input.folderId, title: input.title.trim(), description: input.description }
+          : bookmark,
+      ),
+    );
+  }, []);
+
   const deleteBookmark = useCallback((id: string) => {
     setBookmarks((prev) => prev.filter((bookmark) => bookmark.id !== id));
   }, []);
 
   const value = useMemo(
-    () => ({ bookmarks, addBookmark, deleteBookmark }),
-    [bookmarks, addBookmark, deleteBookmark],
+    () => ({ bookmarks, addBookmark, updateBookmark, deleteBookmark }),
+    [bookmarks, addBookmark, updateBookmark, deleteBookmark],
   );
 
   return <BookmarkContext.Provider value={value}>{children}</BookmarkContext.Provider>;
