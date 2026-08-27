@@ -13,11 +13,17 @@ type EditFolderModalProps = {
 export default function EditFolderModal({ folderId, folderName, onClose }: EditFolderModalProps) {
   const { renameFolder } = useFolders();
   const [name, setName] = useState(folderName);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    if (!name.trim()) return;
-    renameFolder(folderId, name);
-    onClose();
+  const handleSave = async () => {
+    if (!name.trim() || isSaving) return;
+    setIsSaving(true);
+    try {
+      await renameFolder(folderId, name);
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return createPortal(
@@ -42,17 +48,18 @@ export default function EditFolderModal({ folderId, folderName, onClose }: EditF
           <button
             type="button"
             onClick={onClose}
-            className="h-9 rounded-md border border-[var(--border)] px-4 text-sm font-medium text-[var(--text)] transition-colors duration-150 hover:bg-[var(--hover-bg)]"
+            disabled={isSaving}
+            className="h-9 rounded-md border border-[var(--border)] px-4 text-sm font-medium text-[var(--text)] transition-colors duration-150 hover:bg-[var(--hover-bg)] disabled:cursor-not-allowed disabled:opacity-40"
           >
             취소
           </button>
           <button
             type="button"
             onClick={handleSave}
-            disabled={!name.trim()}
+            disabled={!name.trim() || isSaving}
             className="h-9 rounded-md bg-[var(--accent)] px-4 text-sm font-medium text-white transition-colors duration-150 hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-40"
           >
-            저장
+            {isSaving ? "저장 중..." : "저장"}
           </button>
         </div>
       </div>
