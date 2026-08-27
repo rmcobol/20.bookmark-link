@@ -21,7 +21,7 @@ type BookmarkUpdateInput = {
 type BookmarkContextValue = {
   bookmarks: Bookmark[];
   addBookmark: (input: NewBookmarkInput) => Promise<void>;
-  updateBookmark: (id: string, input: BookmarkUpdateInput) => void;
+  updateBookmark: (id: string, input: BookmarkUpdateInput) => Promise<void>;
   deleteBookmark: (id: string) => void;
 };
 
@@ -94,17 +94,32 @@ export function BookmarkProvider({ initialBookmarks = [], children }: BookmarkPr
     [supabase],
   );
 
-  const updateBookmark = useCallback((id: string, input: BookmarkUpdateInput) => {
-    if (!input.title.trim() || !input.folderId) return;
+  const updateBookmark = useCallback(
+    async (id: string, input: BookmarkUpdateInput) => {
+      const title = input.title.trim();
+      if (!title || !input.folderId) return;
 
-    setBookmarks((prev) =>
-      prev.map((bookmark) =>
-        bookmark.id === id
-          ? { ...bookmark, folderId: input.folderId, title: input.title.trim(), description: input.description }
-          : bookmark,
-      ),
-    );
-  }, []);
+      const { error } = await supabase
+        .from("links")
+        .update({
+          title,
+          description: input.description,
+          folder_id: Number(input.folderId),
+        })
+        .eq("id", Number(id));
+
+      if (error) return;
+
+      setBookmarks((prev) =>
+        prev.map((bookmark) =>
+          bookmark.id === id
+            ? { ...bookmark, folderId: input.folderId, title, description: input.description }
+            : bookmark,
+        ),
+      );
+    },
+    [supabase],
+  );
 
   const deleteBookmark = useCallback((id: string) => {
     setBookmarks((prev) => prev.filter((bookmark) => bookmark.id !== id));
