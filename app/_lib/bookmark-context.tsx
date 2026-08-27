@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 import type { Bookmark } from "./types";
 
 type NewBookmarkInput = {
@@ -19,7 +20,7 @@ type BookmarkUpdateInput = {
 
 type BookmarkContextValue = {
   bookmarks: Bookmark[];
-  addBookmark: (input: NewBookmarkInput) => void;
+  addBookmark: (input: NewBookmarkInput) => Promise<void>;
   updateBookmark: (id: string, input: BookmarkUpdateInput) => void;
   deleteBookmark: (id: string) => void;
 };
@@ -27,16 +28,71 @@ type BookmarkContextValue = {
 const BookmarkContext = createContext<BookmarkContextValue | null>(null);
 
 type BookmarkProviderProps = {
-  initialBookmarks: Bookmark[];
+  initialBookmarks?: Bookmark[];
   children: React.ReactNode;
 };
 
-export function BookmarkProvider({ initialBookmarks, children }: BookmarkProviderProps) {
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>(initialBookmarks);
+type LinkRow = {
+  id: number;
+  url: string;
+  title: string | null;
+  description: string | null;
+  thumbnail_url: string | null;
+  folder_id: number | null;
+};
 
-  const addBookmark = useCallback((input: NewBookmarkInput) => {
-    setBookmarks((prev) => [...prev, { id: `bookmark-${Date.now()}`, ...input }]);
-  }, []);
+function toBookmark(row: LinkRow): Bookmark {
+  return {
+    id: String(row.id),
+    url: row.url,
+    title: row.title ?? "",
+    description: row.description ?? "",
+    folderId: row.folder_id != null ? String(row.folder_id) : "",
+    thumbnail: row.thumbnail_url ?? undefined,
+  };
+}
+
+export function BookmarkProvider({ initialBookmarks = [], children }: BookmarkProviderProps) {
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>(initialBookmarks);
+  const supabase = useMemo(() => createClient(), []);
+
+  useEffect(() => {
+    let active = true;
+
+    supabase
+      .from("links")
+      .select("id, url, title, description, thumbnail_url, folder_id")
+      .order("created_at", { ascending: true })
+      .then(({ data }) => {
+        if (!active || !data) return;
+        setBookmarks((data as LinkRow[]).map(toBookmark));
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [supabase]);
+
+  const addBookmark = useCallback(
+    async (input: NewBookmarkInput) => {
+      const { data, error } = await supabase
+        .from("links")
+        .insert({
+          url: input.url,
+          title: input.title,
+          description: input.description,
+          thumbnail_url: input.thumbnail ?? null,
+          folder_id: input.folderId ? Number(input.folderId) : null,
+        })
+        .select("id, url, title, description, thumbnail_url, folder_id")
+        .single();
+
+      if (error || !data) throw error ?? new Error("링크를 저장하지 못했습니다.");
+
+      setBookmarks((prev) => [...prev, toBookmark(data as LinkRow)]);
+    },
+    [supabase],
+  );
 
   const updateBookmark = useCallback((id: string, input: BookmarkUpdateInput) => {
     if (!input.title.trim() || !input.folderId) return;

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { BookmarkProvider } from "./_lib/bookmark-context";
 import { FolderProvider } from "./_lib/folder-context";
-import { bookmarks } from "./_lib/mock-data";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,7 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <FolderProvider>
-          <BookmarkProvider initialBookmarks={bookmarks}>{children}</BookmarkProvider>
+          <BookmarkProvider>{children}</BookmarkProvider>
         </FolderProvider>
       </body>
     </html>

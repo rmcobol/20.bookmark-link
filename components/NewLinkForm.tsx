@@ -22,6 +22,8 @@ export default function NewLinkForm() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSaving) return;
+
     const formData = new FormData(event.currentTarget);
     const url = String(formData.get("url") ?? "").trim();
     const folderId = String(formData.get("folderId") ?? "");
@@ -48,7 +50,7 @@ export default function NewLinkForm() {
         return;
       }
 
-      addBookmark({
+      await addBookmark({
         url: og.url ?? url,
         folderId,
         title: og.title || url,
@@ -58,7 +60,7 @@ export default function NewLinkForm() {
 
       router.push("/");
     } catch {
-      setError("링크 정보를 가져오지 못했습니다. 다시 시도해주세요.");
+      setError("링크를 저장하지 못했습니다. 다시 시도해주세요.");
       setIsSaving(false);
     }
   };
