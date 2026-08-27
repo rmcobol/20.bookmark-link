@@ -1,6 +1,7 @@
 "use client";
 
 import { useBookmarks } from "@/app/_lib/bookmark-context";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 
 type DeleteBookmarkModalProps = {
@@ -15,10 +16,17 @@ export default function DeleteBookmarkModal({
   onClose,
 }: DeleteBookmarkModalProps) {
   const { deleteBookmark } = useBookmarks();
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = () => {
-    deleteBookmark(bookmarkId);
-    onClose();
+  const handleDelete = async () => {
+    if (isDeleting) return;
+    setIsDeleting(true);
+    try {
+      await deleteBookmark(bookmarkId);
+      onClose();
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return createPortal(
@@ -35,16 +43,18 @@ export default function DeleteBookmarkModal({
           <button
             type="button"
             onClick={onClose}
-            className="h-9 rounded-md border border-[var(--border)] px-4 text-sm font-medium text-[var(--text)] transition-colors duration-150 hover:bg-[var(--hover-bg)]"
+            disabled={isDeleting}
+            className="h-9 rounded-md border border-[var(--border)] px-4 text-sm font-medium text-[var(--text)] transition-colors duration-150 hover:bg-[var(--hover-bg)] disabled:cursor-not-allowed disabled:opacity-40"
           >
             취소
           </button>
           <button
             type="button"
             onClick={handleDelete}
-            className="h-9 rounded-md bg-[var(--error)] px-4 text-sm font-medium text-white transition-colors duration-150 hover:opacity-90"
+            disabled={isDeleting}
+            className="h-9 rounded-md bg-[var(--error)] px-4 text-sm font-medium text-white transition-colors duration-150 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            삭제
+            {isDeleting ? "삭제 중..." : "삭제"}
           </button>
         </div>
       </div>
