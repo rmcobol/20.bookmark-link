@@ -2,44 +2,45 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Toast from "@/components/Toast";
 import { createClient } from "@/utils/supabase/client";
 
 function toKoreanMessage(message: string): string {
   const normalized = message.toLowerCase();
-  if (normalized.includes("invalid login credentials")) {
-    return "이메일 또는 비밀번호가 올바르지 않습니다.";
+  if (normalized.includes("different from the old password") || normalized.includes("same_password")) {
+    return "새 비밀번호는 기존 비밀번호와 달라야 합니다.";
   }
-  if (normalized.includes("email not confirmed")) {
-    return "이메일 인증이 완료되지 않았습니다.";
+  if (normalized.includes("should be at least") || normalized.includes("weak")) {
+    return "비밀번호는 6자 이상이어야 합니다.";
   }
-  if (normalized.includes("rate limit") || normalized.includes("too many")) {
-    return "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.";
+  if (normalized.includes("session") || normalized.includes("not authenticated") || normalized.includes("jwt")) {
+    return "재설정 링크가 만료되었습니다. 비밀번호 찾기를 다시 시도해주세요.";
   }
-  return "로그인에 실패했습니다. 잠시 후 다시 시도해주세요.";
+  return "비밀번호 재설정에 실패했습니다. 잠시 후 다시 시도해주세요.";
 }
 
-export default function LoginPage() {
+export default function ResetPasswordPage() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
-  const canSubmit = email.trim() !== "" && password !== "" && !isSubmitting;
+  const canSubmit = password !== "" && passwordConfirm !== "" && !isSubmitting;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!canSubmit) return;
 
+    if (password !== passwordConfirm) {
+      setToast("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
     setIsSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
+    const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
       setToast(toKoreanMessage(error.message));
@@ -65,34 +66,39 @@ export default function LoginPage() {
           🔖 북마크 링크
         </span>
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="text-sm font-medium text-[var(--text)]">
-            이메일
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@example.com"
-            className={inputClass}
-          />
-        </div>
+        <h1 className="text-base font-semibold text-[var(--text)]">비밀번호 재설정</h1>
 
         <div className="flex flex-col gap-2">
           <label htmlFor="password" className="text-sm font-medium text-[var(--text)]">
-            비밀번호
+            새 비밀번호
           </label>
           <input
             id="password"
             name="password"
             type="password"
-            autoComplete="current-password"
+            autoComplete="new-password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            placeholder="비밀번호를 입력하세요"
+            placeholder="새 비밀번호를 입력하세요"
+            className={inputClass}
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label
+            htmlFor="password-confirm"
+            className="text-sm font-medium text-[var(--text)]"
+          >
+            새 비밀번호 확인
+          </label>
+          <input
+            id="password-confirm"
+            name="password-confirm"
+            type="password"
+            autoComplete="new-password"
+            value={passwordConfirm}
+            onChange={(event) => setPasswordConfirm(event.target.value)}
+            placeholder="새 비밀번호를 다시 입력하세요"
             className={inputClass}
           />
         </div>
@@ -102,28 +108,8 @@ export default function LoginPage() {
           disabled={!canSubmit}
           className="h-10 rounded-md bg-[var(--accent)] text-sm font-medium text-white transition-colors duration-150 hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {isSubmitting ? "로그인 중..." : "로그인"}
+          {isSubmitting ? "변경 중..." : "비밀번호 변경"}
         </button>
-
-        <p className="text-center text-sm text-[var(--text-sub)]">
-          비밀번호를 잊으셨나요?{" "}
-          <Link
-            href="/forgot-password"
-            className="font-medium text-[var(--accent)] hover:underline"
-          >
-            비밀번호 찾기
-          </Link>
-        </p>
-
-        <p className="text-center text-sm text-[var(--text-sub)]">
-          계정이 없으신가요?{" "}
-          <Link
-            href="/signup"
-            className="font-medium text-[var(--accent)] hover:underline"
-          >
-            회원가입
-          </Link>
-        </p>
       </form>
     </main>
   );
