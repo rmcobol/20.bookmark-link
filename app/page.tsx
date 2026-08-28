@@ -1,8 +1,11 @@
 import BookmarkGrid from "@/components/BookmarkGrid";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
+import { requireUser } from "./_lib/require-user";
 
-export default function Home() {
+export default async function Home() {
+  await requireUser();
+
   return (
     <div className="flex flex-1 flex-col bg-[var(--background)]">
       <Header />

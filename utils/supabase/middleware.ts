@@ -35,7 +35,22 @@ export const updateSession = async (request: NextRequest) => {
 
   // IMPORTANT: Do not run code between createServerClient and getUser().
   // Refreshing the auth token here keeps sessions alive once auth is added.
-  await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // 로그인한 사용자만 접근 가능한 경로: 인덱스, 폴더별 페이지, 새 링크 페이지
+  const { pathname } = request.nextUrl;
+  const isProtected =
+    pathname === "/" ||
+    pathname === "/new" ||
+    pathname.startsWith("/folder");
+
+  if (!user && isProtected) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    return NextResponse.redirect(loginUrl);
+  }
 
   return supabaseResponse
 };

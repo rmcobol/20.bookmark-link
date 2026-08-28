@@ -3,6 +3,7 @@
 import { useFolders } from "@/app/_lib/folder-context";
 import Link from "next/link";
 import FolderList from "./FolderList";
+import LogoutButton from "./LogoutButton";
 
 type SidebarProps = {
   activeFolderId?: string;
@@ -26,6 +27,7 @@ export default function Sidebar({ activeFolderId }: SidebarProps) {
         전체
       </Link>
       <FolderList folders={folders} activeFolderId={activeFolderId} />
+      <LogoutButton />
     </aside>
   );
 }

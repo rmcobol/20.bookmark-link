@@ -1,8 +1,11 @@
 import Header from "@/components/Header";
 import NewLinkForm from "@/components/NewLinkForm";
 import Sidebar from "@/components/Sidebar";
+import { requireUser } from "@/app/_lib/require-user";
 
-export default function NewLinkPage() {
+export default async function NewLinkPage() {
+  await requireUser();
+
   return (
     <div className="flex flex-1 flex-col bg-[var(--background)]">
       <Header />
