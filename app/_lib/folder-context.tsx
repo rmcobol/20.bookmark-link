@@ -21,13 +21,38 @@ type FolderProviderProps = {
 export function FolderProvider({ initialFolders = [], children }: FolderProviderProps) {
   const [folders, setFolders] = useState<Folder[]>(initialFolders);
   const supabase = useMemo(() => createClient(), []);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    let active = true;
+
+    supabase.auth.getUser().then(({ data }) => {
+      if (!active) return;
+      setUserId(data.user?.id ?? null);
+    });
+
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id ?? null);
+    });
+
+    return () => {
+      active = false;
+      subscription.subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  useEffect(() => {
+    if (!userId) {
+      setFolders([]);
+      return;
+    }
+
     let active = true;
 
     supabase
       .from("folders")
       .select("id, name")
+      .eq("user_id", userId)
       .order("created_at", { ascending: true })
       .then(({ data }) => {
         if (!active || !data) return;
@@ -37,7 +62,7 @@ export function FolderProvider({ initialFolders = [], children }: FolderProvider
     return () => {
       active = false;
     };
-  }, [supabase]);
+  }, [supabase, userId]);
 
   const addFolder = useCallback(
     async (name: string) => {

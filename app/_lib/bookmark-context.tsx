@@ -55,13 +55,38 @@ function toBookmark(row: LinkRow): Bookmark {
 export function BookmarkProvider({ initialBookmarks = [], children }: BookmarkProviderProps) {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>(initialBookmarks);
   const supabase = useMemo(() => createClient(), []);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    let active = true;
+
+    supabase.auth.getUser().then(({ data }) => {
+      if (!active) return;
+      setUserId(data.user?.id ?? null);
+    });
+
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id ?? null);
+    });
+
+    return () => {
+      active = false;
+      subscription.subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  useEffect(() => {
+    if (!userId) {
+      setBookmarks([]);
+      return;
+    }
+
     let active = true;
 
     supabase
       .from("links")
       .select("id, url, title, description, thumbnail_url, folder_id")
+      .eq("user_id", userId)
       .order("created_at", { ascending: true })
       .then(({ data }) => {
         if (!active || !data) return;
@@ -71,7 +96,7 @@ export function BookmarkProvider({ initialBookmarks = [], children }: BookmarkPr
     return () => {
       active = false;
     };
-  }, [supabase]);
+  }, [supabase, userId]);
 
   const addBookmark = useCallback(
     async (input: NewBookmarkInput) => {
