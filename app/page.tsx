@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import BookmarkGrid from "@/components/BookmarkGrid";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { requireUser } from "./_lib/require-user";
+
+export const metadata: Metadata = {
+  title: "홈",
+  description: "저장한 모든 북마크를 폴더별로 한눈에 확인하세요.",
+};
 
 export default async function Home() {
   await requireUser();
