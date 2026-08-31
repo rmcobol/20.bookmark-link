@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import Toast from "@/components/Toast";
 import { createClient } from "@/utils/supabase/client";
 
@@ -48,6 +49,19 @@ export default function LoginPage() {
     }
 
     router.push("/");
+  };
+
+  const handleKakaoLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "kakao",
+      options: {
+        redirectTo: `${window.location.origin}/auth/confirm`,
+      },
+    });
+
+    if (error) {
+      setToast(toKoreanMessage(error.message));
+    }
   };
 
   const inputClass =
@@ -103,6 +117,20 @@ export default function LoginPage() {
           className="h-10 rounded-md bg-[var(--accent)] text-sm font-medium text-white transition-colors duration-150 hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-40"
         >
           {isSubmitting ? "로그인 중..." : "로그인"}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleKakaoLogin}
+          className="relative h-[45px] w-full overflow-hidden rounded-md"
+        >
+          <Image
+            src="/kakao_login_medium_wide.png"
+            alt="카카오 로그인"
+            fill
+            className="object-contain"
+            priority
+          />
         </button>
 
         <p className="text-center text-sm text-[var(--text-sub)]">
