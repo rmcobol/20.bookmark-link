@@ -14,7 +14,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+function resolveSiteUrl(): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
+  // Vercel: 프로덕션 도메인 (프리뷰 배포에서도 프로덕션 URL 반환)
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  // Vercel: 배포별 URL (프로덕션 도메인이 없을 때)
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3000";
+}
+
+const siteUrl = resolveSiteUrl();
 const description = "폴더별로 정리하는 나만의 북마크 서비스";
 
 export const metadata: Metadata = {
